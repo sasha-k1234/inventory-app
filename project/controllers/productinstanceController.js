@@ -5,7 +5,9 @@ const asyncHandler = require('express-async-handler');
 const {body,validationResult} = require('express-validator');
 
 exports.productinstance_list = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: ProductInstance list");
+  const allProductInstances = await ProductInstance.find().populate("product").exec();
+
+  res.render("productInstance_list",{title:"Product Instance List",instances_list:allProductInstances});
   });
   
   // Display detail page for a specific ProductInstance.
