@@ -1,0 +1,9 @@
+extends layout 
+
+block content 
+    h1=title 
+    if all_categories.length 
+    ul 
+        each category in all_categories 
+            li 
+                a(href=category.url) #{category.name}

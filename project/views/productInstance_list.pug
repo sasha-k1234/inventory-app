@@ -1,0 +1,19 @@
+extends layout
+
+block content
+ h1=title
+
+ if instances_list.length
+    ul
+      each val in instances_list
+        li
+          a(href=val.url)  #{val.product.title}
+          if val.status == 'Available'
+            span.text-success  #{val.status}
+          else if val.status == 'Maintenance'
+            span.text-danger  #{val.status}
+          else if val.status == 'Out Of Stock'
+            span  In Stock:  #{val.in_stock_formatted}
+ else
+    p No product instances.
+

@@ -2,4 +2,14 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
+  p Welcome to the Store ! 
+
+  h2  Our products count
+
+  
+  ul
+    li #[strong Products:] !{products_count}
+    li #[strong Product Instances:] !{product_instance_count}
+    li #[strong Instances Availible:] !{availible_count}
+    li #[strong Categories:] !{category_count}
+  
