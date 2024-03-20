@@ -3,7 +3,7 @@
 console.log(
   'This script populates some test books, authors, genres and bookinstances to your database. Specified database as argument - e.g.: node populatedb "mongodb+srv://cooluser:coolpassword@cluster0.lz91hw2.mongodb.net/local_library?retryWrites=true&w=majority"'
 );
-
+require('dotenv').config();
 // Get arguments passed on command line
 const userArgs = process.argv.slice(2);
 
@@ -19,7 +19,7 @@ const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
 
 const mongoDB =
-  "mongodb+srv://sasha:sasha@cluster0.yv9oy7k.mongodb.net/inventory_app?retryWrites=true&w=majority&appName=Cluster0";
+  process.env.MONGODB_URI;
 
 main().catch((err) => console.log(err));
 
