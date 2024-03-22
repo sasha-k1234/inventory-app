@@ -5,17 +5,15 @@ const { body, validationResult } = require("express-validator");
 const asyncHandler = require("express-async-handler");
 
 exports.index = asyncHandler(async (req, res, next) => {
-  const [numProducts, numProductInstances, numAvailible, numCategories] =
+  const [numProductInstances, numAvailible, numCategories] =
     await Promise.all([
-      Product.countDocuments({}).exec(),
       ProductInstance.countDocuments({}).exec(),
-      ProductInstance.countDocuments({ status: "Availible" }).exec(),
+      ProductInstance.countDocuments({ status: "Available" }).exec(),
       Category.countDocuments({}).exec(),
     ]);
 
   res.render("index", {
     title: "Store Home Page",
-    products_count: numProducts,
     product_instance_count: numProductInstances,
     availible_count:numAvailible,
     category_count: numCategories,
@@ -31,7 +29,22 @@ exports.products_list = asyncHandler(async (req, res, next) => {
 });
 
 exports.product_detail = asyncHandler(async (req, res, next) => {
-  res.send("ni product detail");
+  const [product,productInstances] = await Promise.all([
+    Product.findById(req.params.id).populate('category').exec(),
+    ProductInstance.find({product:req.params.id}).exec(),
+  ]);
+
+  if (product === null) {
+    const err = new Error('Product not found!');
+    err.status = 404;
+    next(err);
+  }
+
+  res.render("product_detail",{
+    title:product.title,
+    product:product,
+    product_instances:productInstances,
+  });
 });
 
 exports.product_create_get = asyncHandler(async (req, res, next) => {

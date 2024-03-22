@@ -8,8 +8,8 @@ const ProductInstanceSchema = new Schema({
     status:{
         type:String,
         required:true,
-        enum:["Availible","Out Of Stock","Maintenance"],
-        default:"Maintenance"
+        enum:["Available","Out Of Stock","Repairing"],
+        default:"Repairing"
     },
     in_stock:{type:Date,default:Date.now},
 });

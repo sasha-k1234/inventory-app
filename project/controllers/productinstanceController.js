@@ -12,7 +12,18 @@ exports.productinstance_list = asyncHandler(async (req, res, next) => {
   
   // Display detail page for a specific ProductInstance.
   exports.productinstance_detail = asyncHandler(async (req, res, next) => {
-    res.send(`NOT IMPLEMENTED: ProductInstance detail: ${req.params.id}`);
+    const productInstance = await ProductInstance.findById(req.params.id).populate('product').exec();
+
+    if (productInstance === null) {
+      const err = new Error('Instance not found');
+      err.stautus = 404;
+      next(err);
+    }
+
+    res.render("productinstance_detail",{
+      title:"Product",
+      productInstance:productInstance
+    });
   });
   
   // Display ProductInstance create form on GET.
