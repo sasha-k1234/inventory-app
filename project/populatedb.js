@@ -3,7 +3,7 @@
 console.log(
   'This script populates some test books, authors, genres and bookinstances to your database. Specified database as argument - e.g.: node populatedb "mongodb+srv://cooluser:coolpassword@cluster0.lz91hw2.mongodb.net/local_library?retryWrites=true&w=majority"'
 );
-require('dotenv').config();
+require("dotenv").config();
 // Get arguments passed on command line
 const userArgs = process.argv.slice(2);
 
@@ -18,8 +18,7 @@ const productInstances = [];
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
 
-const mongoDB =
-  process.env.MONGODB_URI;
+const mongoDB = process.env.MONGODB_URI;
 
 main().catch((err) => console.log(err));
 
@@ -27,9 +26,9 @@ async function main() {
   console.log("Debug: About to connect");
   await mongoose.connect(mongoDB);
   console.log("Debug: Should be connected?");
+  await createCategories();
   await createProducts();
   await createProductInstances();
-  await createCategories();
   console.log("Debug: Closing mongoose");
   mongoose.connection.close();
 }
@@ -43,7 +42,6 @@ async function categoryCreate(index, name) {
   categories[index] = category;
   console.log(`Added category: ${name}`);
 }
-
 
 async function productCreate(index, title, price, description, category) {
   const productDetail = {
@@ -61,7 +59,6 @@ async function productCreate(index, title, price, description, category) {
   products[index] = product;
   console.log(`added product ${product}`);
 }
-
 
 async function productInstanceCreate(index, product, status, in_stock) {
   const productInstanceDetail = {
@@ -88,7 +85,6 @@ async function createCategories() {
   ]);
 }
 
-
 async function createProducts() {
   console.log("adding products!");
   await Promise.all([
@@ -98,9 +94,7 @@ async function createProducts() {
     productCreate(1, "Basketball shoes", 230, "Great basketball shoes", [
       categories[0],
     ]),
-    productCreate(2, "Tennis shoes", 154, "Great for tennis", [
-      categories[0],
-    ]),
+    productCreate(2, "Tennis shoes", 154, "Great for tennis", [categories[0]]),
     productCreate(
       3,
       "Winter puffer jacket",
@@ -123,20 +117,17 @@ async function createProducts() {
   ]);
 }
 
-
 async function createProductInstances() {
   await Promise.all([
-    productInstanceCreate(0,products[0],"Availible",false),
-    productInstanceCreate(1,products[1],"Maintenance",false),
-    productInstanceCreate(2,products[2],"Out Of Stock",false),
-    productInstanceCreate(3,products[3],"Availible",false),
-    productInstanceCreate(4,products[3],"Availible",false),
-    productInstanceCreate(4,products[3],"Availible",false),
-    productInstanceCreate(5,products[0],"Availible",false),
-    productInstanceCreate(6,products[6],"Availible",false),
-    productInstanceCreate(7,products[0],false,false),
-    productInstanceCreate(8,products[2],false,false),
+    productInstanceCreate(0, products[0], "Available", false),
+    productInstanceCreate(1, products[1], "Repairing", false),
+    productInstanceCreate(2, products[2], "Out Of Stock", false),
+    productInstanceCreate(3, products[3], "Available", false),
+    productInstanceCreate(4, products[3], "Available", false),
+    productInstanceCreate(4, products[3], "Available", false),
+    productInstanceCreate(5, products[0], "Available", false),
+    productInstanceCreate(6, products[6], "Repairing", false),
+    productInstanceCreate(7, products[0], false, false),
+    productInstanceCreate(8, products[2], false, false),
   ]);
 }
-
-
