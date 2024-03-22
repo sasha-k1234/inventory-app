@@ -10,8 +10,8 @@ block content
           a(href=val.url)  #{val.product.title}
           if val.status == 'Available'
             span.text-success  #{val.status}
-          else if val.status == 'Maintenance'
-            span.text-danger  #{val.status}
+          else if val.status == 'Repairing'
+            span.text-warning  #{val.status}
           else if val.status == 'Out Of Stock'
             span  In Stock:  #{val.in_stock_formatted}
  else

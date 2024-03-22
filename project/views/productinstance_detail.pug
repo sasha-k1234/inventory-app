@@ -1,0 +1,18 @@
+extends layout
+
+block content
+ h1 ID: #{productInstance._id}
+
+ p #[strong Title: ]
+    a(href=productInstance.product.url) #{productInstance.product.title}
+
+ p #[strong Status:]
+    if productInstance.status == "Available"
+      span.text-success #{productInstance.status}
+    else if productInstance.status == 'Repairing'
+      span.text-warning #{productInstance.status}
+    else
+      span.text-danger #{productInstance.status}
+
+ if productInstance.status != "Available"
+    p #[strong In Stock:] #{productInstance.in_stock_formatted}
