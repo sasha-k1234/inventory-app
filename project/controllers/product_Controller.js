@@ -44,17 +44,71 @@ exports.product_detail = asyncHandler(async (req, res, next) => {
     title:product.title,
     product:product,
     product_instances:productInstances,
+    
   });
 });
 
 exports.product_create_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Product create GET");
+  const allCategories = await Category.find().sort({name:1}).exec();
+
+  res.render("product_form",{title:'Create Product',categories:allCategories});
 });
 
 // Handle product create on POST.
-exports.product_create_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Product create POST");
-});
+exports.product_create_post = [
+  (req,res,next) => {
+    if (!Array.isArray(req.body.category)) {
+      typeof req.body.category === 'undefined'?[]:[req.body.category];
+    }
+    next();
+  },
+
+  body("title","title cannot be empty!")
+      .trim()
+      .isLength({min:3})
+      .escape(),
+  body("description","description cannot be empty")
+      .trim()
+      .isLength({min:4})
+      .escape(),
+  body("price")
+      .trim()
+      .isLength({min:1})
+      .escape(),
+  body("category.*").escape(),
+
+  asyncHandler(async(req,res,next)=>{
+    const errors = validationResult(req);
+
+    const product = new Product({
+      title:req.body.title,
+      description:req.body.description,
+      price:req.body.price,
+      category:req.body.category,
+    });
+    
+    
+
+      if (!errors.isEmpty()) {
+        const allCategories = await Category.find().sort({name:1}).exec();
+        for(const category of allCategories) {
+          if (product.category.includes(category._id)) {
+            category.checked = 'true';
+          }
+        }
+        console.log(allCategories);
+        res.render("product_form",{
+            title:"Create Product",
+            categories:allCategories,
+            product:product,
+            errors:errors.array(),
+        });
+      } else {
+        await product.save();
+        res.redirect(product.url);
+      }
+  }),
+];
 
 // Display product delete form on GET.
 exports.product_delete_get = asyncHandler(async (req, res, next) => {
