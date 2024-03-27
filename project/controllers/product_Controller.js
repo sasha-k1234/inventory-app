@@ -108,12 +108,42 @@ exports.product_create_post = [
 
 // Display product delete form on GET.
 exports.product_delete_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Product delete GET");
+  const [product, allProductsInInstances] = await Promise.all([
+    Product.findById(req.params.id).exec(),
+    ProductInstance.find({ product: req.params.id }, "title price").exec(),
+  ]);
+
+  if (product === null) {
+    const err = new Error("product not found!");
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render("product_delete", {
+    title: "Delete Product",
+    product: product,
+    product_in_instances: allProductsInInstances,
+  });
 });
 
 // Handle product delete on POST.
 exports.product_delete_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Product delete POST");
+  const [product, allProductsInInstances] = await Promise.all([
+    Product.findById(req.params.id).exec(),
+    ProductInstance.find({ product: req.params.id }, "title price").exec(),
+  ]);
+
+  if (allProductsInInstances.length > 0) {
+    res.render("product_delete", {
+      title: "Delete Product",
+      product: product,
+      product_in_instances: allProductsInInstances,
+    });
+    return;
+  } else {
+    await Product.findByIdAndDelete(req.body.productId);
+    res.redirect("/catalog/products");
+  }
 });
 
 // Display product update form on GET.
@@ -136,7 +166,7 @@ exports.product_update_get = asyncHandler(async (req, res, next) => {
   res.render("product_form", {
     title: "Update Product",
     categories: allCategories,
-    product:product,
+    product: product,
   });
 });
 
@@ -166,7 +196,7 @@ exports.product_update_post = [
       description: req.body.description,
       price: req.body.price,
       category:
-      typeof req.body.category === "undefined" ? [] : req.body.category,
+        typeof req.body.category === "undefined" ? [] : req.body.category,
       _id: req.params.id,
     });
 
@@ -186,7 +216,11 @@ exports.product_update_post = [
       });
       return;
     } else {
-      const updatedProduct = await Product.findByIdAndUpdate(req.params.id,product,{});
+      const updatedProduct = await Product.findByIdAndUpdate(
+        req.params.id,
+        product,
+        {}
+      );
       res.redirect(updatedProduct.url);
     }
   }),

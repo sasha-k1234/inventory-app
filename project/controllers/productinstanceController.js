@@ -77,20 +77,94 @@ exports.productinstance_list = asyncHandler(async (req, res, next) => {
   
   // Display ProductInstance delete form on GET.
   exports.productinstance_delete_get = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: ProductInstance delete GET");
+   const productInstance = await ProductInstance.findById(req.params.id).exec();
+
+   if (productInstance===null) {
+    const err = new Error('productinstance not found!');
+    err.status = 404;
+    next(err);
+   }
+
+   res.render('productinstance_delete',{
+    title:"Delete ProductInstance",
+    productInstance:productInstance,
+   });
   });
   
   // Handle ProductInstance delete on POST.
   exports.productinstance_delete_post = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: ProductInstance delete POST");
+    const productInstance = await ProductInstance.findById(req.params.id).exec();
+
+    if (productInstance.length>0) {
+      res.render('productinstance_delete',{
+        title:"Delete ProductInstance",
+        productInstance:productInstance,
+      });
+      return;
+    } else {
+      await ProductInstance.findByIdAndDelete(req.body.instanceId);
+      res.redirect('/catalog/productinstances');
+    }
   });
   
   // Display ProductInstance update form on GET.
   exports.productinstance_update_get = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: ProductInstance update GET");
+    const [productInstance,allProducts] = await Promise.all([
+      ProductInstance.findById(req.params.id).populate("product").exec(),
+      Product.find(),
+    ]);
+
+    if (productInstance === null) {
+      const err = new Error('productInstance not found!');
+      err.status = 404;
+     return next(err);
+    }
+
+    res.render("productinstance_form",{
+      title:"Update Instance",
+      productinstance:productInstance,
+      products_list:allProducts,
+      selected_product:productInstance.product._id,
+    });
+
   });
   
   // Handle productinstance update on POST.
-  exports.productinstance_update_post = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: ProductInstance update POST");
-  });
+  exports.productinstance_update_post = [
+    body("product","product must be specified!")
+        .trim()
+        .isLength({min:3})
+        .escape(),
+    body('status').escape(),
+    body('in_stock',"Invalid date")
+        .optional({values:'falsy'})
+        .isISO8601()
+        .toDate(),
+
+    asyncHandler(async(req,res)=>{
+      const errors = validationResult(req);
+
+      const productInstance = new ProductInstance({
+        product:req.body.product,
+        status:req.body.status,
+        _id:req.params.id,
+        in_stock:req.body.in_stock,
+      });
+
+      if (!errors.isEmpty()) {
+        const allProducts = await Product.find({},"title").exec();
+
+        res.render('productinstance_form',{
+          title:"Update Instance",
+          products_list:allProducts,
+          selected_product:productInstance.product._id,
+          errors:errors.array(),
+          productInstance:productInstance,
+        });
+        return;
+      } else {
+        await ProductInstance.findByIdAndUpdate(req.params.id,productInstance,{});
+        res.redirect(productInstance.url);
+      }
+    }),
+  ];

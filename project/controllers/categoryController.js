@@ -73,20 +73,80 @@ exports.category_create_post = [
 
 // Display Category delete form on GET.
 exports.category_delete_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Category delete GET");
+  const [category, allProductsInCategory] = await Promise.all([
+    Category.findById(req.params.id).exec(),
+    Product.find({ category: req.params.id }, "title price").exec(),
+  ]);
+
+  if (category === null) {
+    const err = new Error("category not found");
+    err.status = 404;
+    next(err);
+  }
+
+  res.render("category_delete", {
+    title: "Delete Category",
+    category: category,
+    products_in_category: allProductsInCategory,
+  });
 });
 
 // Handle Category delete on POST.
 exports.category_delete_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Category delete POST");
+  const [category, allProductsInCategory] = await Promise.all([
+    Category.findById(req.params.id).exec(),
+    Product.find({ category: req.params.id }, "title price").exec(),
+  ]);
+
+  if (allProductsInCategory.length > 0) {
+    res.render("category_delete", {
+      title: "Delete Category",
+      category: category,
+      products_in_category: allProductsInCategory,
+    });
+    return;
+  } else {
+    await Category.findByIdAndDelete(req.body.categoryId);
+    res.redirect("/catalog/categories");
+  }
 });
 
 // Display Category update form on GET.
 exports.category_update_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Category update GET");
+  const category = await Category.findById(req.params.id);
+
+  if (category === null) {
+    const err = new Error("category not found");
+    err.status = 404;
+    next(err);
+  }
+
+  res.render("category_form", {
+    title: "Update Category",
+    category: category,
+  });
 });
 
 // Handle Category update on POST.
-exports.category_update_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Category update POST");
-});
+exports.category_update_post = [
+  body("name", "name must be specified").trim().isLength({ min: 3 }).escape(),
+
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    const category = new Category({
+      name: req.body.name,
+      _id: req.params.id,
+    });
+    if (!errors.isEmpty()) {
+      res.render("category_form", {
+        title: "Category Update",
+        category: category,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      await Category.findByIdAndUpdate(req.params.id, category);
+      res.redirect(category.url);
+    }
+  }),
+];
