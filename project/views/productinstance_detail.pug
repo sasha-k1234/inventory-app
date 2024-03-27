@@ -6,6 +6,11 @@ block content
  p #[strong Title: ]
     a(href=productInstance.product.url) #{productInstance.product.title}
 
+ p #[strong]
+    a(href=productInstance.url+'/delete') Delete Instance
+    hr 
+    a(href=productInstance.url+'/update') Update Instance
+
  p #[strong Status:]
     if productInstance.status == "Available"
       span.text-success #{productInstance.status}

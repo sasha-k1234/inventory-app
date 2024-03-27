@@ -11,6 +11,11 @@ block content
       if index < product.category.length - 1
         |,&nbsp;
 
+ p
+   a(href=product.url+'/delete') Delete Product
+ p
+   a(href=product.url+'/update') Update Product
+
  div(style='margin-left:20px;margin-top:20px')
     h2 Pieces 
 
@@ -28,10 +33,6 @@ block content
         p #[strong In Stock:] #{val.in_stock_formatted}
       p #[strong Id: ]
         a(href=val.url) #{val._id}
-        p
-          a(href=product.url+'/delete') Delete Product
-        p
-          a(href=product.url+'/update') Update Product
     else
       p no instances
 
