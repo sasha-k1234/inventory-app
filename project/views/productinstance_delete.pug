@@ -1,0 +1,11 @@
+extends layout 
+
+block content 
+
+  h1 #{title}:#{productInstance.product.title} 
+
+  form(method="POST")
+    div.form-group 
+      input#instanceId.form-control(type='hidden',name='instanceId',value=productInstance._id)
+      h5 You sure you want to delete that?
+      button.btn.btn-primary(type='submit') Delete

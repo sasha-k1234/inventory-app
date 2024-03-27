@@ -1,0 +1,25 @@
+extends layout 
+
+block content 
+
+  h1 #{title}: #{category.name} 
+
+  if products_in_category.length 
+
+    p #[strong Delete the following product before deleting category.]
+    div(style='margin-left:20px;margin-top:20px')
+      h4 Products: 
+      dl 
+       each product in products_in_category 
+          dt 
+            a(href=product.url) #{product.title} 
+          dd #{product.price}$ 
+
+  else 
+    p Do you really want to delete this Category? 
+
+    form(method="POST")
+      div.form-group 
+        input#productId.form-control(type='hidden',name='categoryId',value=category._id)
+
+      button.btn.btn-primary(type='submit') Delete 
